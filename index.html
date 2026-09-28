@@ -157,9 +157,8 @@
   <script>
     const { createApp, ref, computed, onMounted } = Vue;
 
-    // CONFIGURATION
-    const BIN_ID = 'YOUR_JSONBIN_BIN_ID_HERE';
-    const API_KEY = 'YOUR_JSONBIN_API_KEY_HERE';
+    // CONFIGURATION: Replace with your actual Cloudflare Worker URL
+    const API_URL = 'https://household-api.tamizh602.workers.dev/';
 
     createApp({
       setup() {
@@ -181,15 +180,13 @@
         const newInv = ref({ name: '', category: '', quantity: 1, unit: 'pkts', minQuantity: 1 });
         const newRem = ref({ title: '', category: '', targetDate: '', notes: '', notifyDaysBefore: 14 });
 
-        // FETCH DATA FROM JSONBIN
+        // FETCH DATA FROM CLOUDFLARE WORKER / KV
         const fetchData = async () => {
           loading.value = true;
           errorMessage.value = '';
           try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, {
-              headers: { 'X-Master-Key': API_KEY }
-            });
-            if (!res.ok) throw new Error('Failed to fetch data from server.');
+            const res = await fetch(API_URL);
+            if (!res.ok) throw new Error('Failed to fetch data from Cloudflare Worker API.');
             const result = await res.json();
             data.value = {
               inventory: result.inventory || [],
@@ -203,20 +200,17 @@
           }
         };
 
-        // SAVE DATA TO JSONBIN
+        // SAVE DATA TO CLOUDFLARE WORKER / KV
         const saveData = async () => {
           saving.value = true;
           errorMessage.value = '';
           try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+            const res = await fetch(API_URL, {
               method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': API_KEY
-              },
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(data.value)
             });
-            if (!res.ok) throw new Error('Failed to save updates to server.');
+            if (!res.ok) throw new Error('Failed to save updates to Cloudflare Worker API.');
             lastSynced.value = new Date().toLocaleTimeString();
           } catch (err) {
             errorMessage.value = err.message || 'Error saving updates.';
