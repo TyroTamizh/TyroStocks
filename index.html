@@ -9,100 +9,110 @@
   <!-- Vue 3 via CDN -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen">
 
   <div id="app" class="max-w-2xl mx-auto p-4 pb-20">
     
-    <!-- Header -->
-    <header class="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+    <!-- Royal Header -->
+    <header class="flex justify-between items-center mb-6 bg-slate-900/90 backdrop-blur-md p-4 rounded-2xl border border-purple-800/40 shadow-lg shadow-purple-950/40">
       <div>
-        <h1 class="text-xl font-bold text-gray-900">🏠 Household Hub</h1>
-        <p class="text-xs text-gray-500" v-if="lastSynced">Synced: {{ lastSynced }}</p>
+        <h1 class="text-xl font-extrabold bg-gradient-to-r from-purple-400 via-purple-300 to-indigo-300 bg-clip-text text-transparent flex items-center gap-2">
+          👑 Household Hub
+        </h1>
+        <p class="text-[11px] text-purple-300/60 mt-0.5" v-if="lastSynced">Synced: {{ lastSynced }}</p>
       </div>
-      <button @click="fetchData" class="px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition" :disabled="loading">
-        <span v-if="loading">Syncing...</span>
+      <button @click="fetchData" class="px-3 py-1.5 text-xs font-semibold text-purple-200 bg-purple-900/40 border border-purple-500/30 rounded-xl hover:bg-purple-800/50 hover:border-purple-400/50 transition duration-200" :disabled="loading">
+        <span v-if="loading" class="animate-pulse">Syncing...</span>
         <span v-else>🔄 Refresh</span>
       </button>
     </header>
 
-    <!-- Navigation Tabs -->
-    <nav class="flex space-x-2 mb-6 bg-gray-200 p-1 rounded-xl">
+    <!-- Royal Navigation Tabs -->
+    <nav class="flex space-x-2 mb-6 bg-slate-900/60 p-1 rounded-2xl border border-purple-900/30">
       <button 
         @click="activeTab = 'inventory'" 
-        :class="['flex-1 py-2 text-sm font-semibold rounded-lg transition', activeTab === 'inventory' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900']">
+        :class="['flex-1 py-2 text-xs font-bold rounded-xl transition duration-200', activeTab === 'inventory' ? 'bg-gradient-to-r from-purple-700 to-indigo-700 text-white shadow-md shadow-purple-900/50' : 'text-purple-300/60 hover:text-purple-200 hover:bg-purple-950/30']">
         🛒 Stock Inventory ({{ data.inventory.length }})
       </button>
       <button 
         @click="activeTab = 'reminders'" 
-        :class="['flex-1 py-2 text-sm font-semibold rounded-lg transition', activeTab === 'reminders' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900']">
+        :class="['flex-1 py-2 text-xs font-bold rounded-xl transition duration-200', activeTab === 'reminders' ? 'bg-gradient-to-r from-purple-700 to-indigo-700 text-white shadow-md shadow-purple-900/50' : 'text-purple-300/60 hover:text-purple-200 hover:bg-purple-950/30']">
         📅 Renewals & Dates ({{ data.reminders.length }})
       </button>
     </nav>
 
     <!-- Global Error Message -->
-    <div v-if="errorMessage" class="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 text-sm rounded-lg flex justify-between items-center">
+    <div v-if="errorMessage" class="mb-4 p-3 bg-red-950/80 border border-red-700/50 text-red-200 text-xs rounded-xl flex justify-between items-center shadow-lg">
       <span>{{ errorMessage }}</span>
-      <button @click="errorMessage = ''" class="font-bold ml-2">&times;</button>
+      <button @click="errorMessage = ''" class="font-bold ml-2 text-red-400 hover:text-white">&times;</button>
     </div>
 
     <!-- TAB 1: INVENTORY MANAGER -->
     <main v-if="activeTab === 'inventory'">
       <!-- Controls & Filters Bar -->
       <div class="flex flex-col gap-3 mb-4">
-        <button @click="showAddInventory = !showAddInventory" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded-lg transition">
+        <button @click="showAddInventory = !showAddInventory" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition">
           {{ showAddInventory ? 'Cancel' : '+ Add New Stock Item' }}
         </button>
 
         <!-- Filters Section -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-900/80 p-3 rounded-2xl border border-purple-900/40 shadow-sm">
           <!-- Category Filter -->
           <div class="flex items-center gap-2">
-            <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Category:</label>
-            <select v-model="selectedCategoryFilter" class="w-full p-1.5 text-xs border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="text-xs font-semibold text-purple-200/80 whitespace-nowrap">Category:</label>
+            <select v-model="selectedCategoryFilter" class="w-full p-2 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
               <option value="ALL">All Categories</option>
               <option v-for="cat in CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
           <!-- Low Stock Toggle -->
-          <label class="inline-flex items-center cursor-pointer text-xs font-medium text-gray-700 justify-between sm:justify-start">
+          <label class="inline-flex items-center cursor-pointer text-xs font-medium text-purple-200/80 justify-between sm:justify-start">
             <span class="me-3">Low / Out of Stock Only</span>
             <input type="checkbox" v-model="filterLowStock" class="sr-only peer">
-            <div class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+            <div class="relative w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
           </label>
         </div>
       </div>
 
       <!-- Add New Stock Form -->
-      <section v-if="showAddInventory" class="mb-6 p-4 bg-white border border-blue-200 rounded-xl shadow-sm">
-        <h3 class="text-sm font-bold text-gray-800 mb-3">Add Stock Item</h3>
-        <form @submit.prevent="addInventoryItem" class="grid grid-cols-2 gap-3 text-sm">
-          <input v-model="newInv.name" placeholder="Item Name (e.g. Sona Masoori Rice)" required class="col-span-2 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+      <section v-if="showAddInventory" class="mb-6 p-4 bg-slate-900 border border-purple-700/50 rounded-2xl shadow-xl shadow-purple-950/50">
+        <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider mb-3">Add Stock Item</h3>
+        <form @submit.prevent="addInventoryItem" class="grid grid-cols-2 gap-3 text-xs">
           
+          <!-- Item Name -->
+          <div class="col-span-2 flex flex-col">
+            <label class="text-[11px] text-purple-300/70 mb-1">Item Name</label>
+            <input v-model="newInv.name" placeholder="e.g. Sona Masoori Rice" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
+          </div>
+
           <!-- Category Dropdown -->
           <div class="flex flex-col col-span-2 sm:col-span-1">
-            <label class="text-xs text-gray-500 mb-1">Category</label>
-            <select v-model="newInv.category" required class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            <label class="text-[11px] text-purple-300/70 mb-1">Category</label>
+            <select v-model="newInv.category" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
               <option v-for="cat in CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
+          <!-- Unit -->
           <div class="flex flex-col col-span-2 sm:col-span-1">
-            <label class="text-xs text-gray-500 mb-1">Unit</label>
-            <input v-model="newInv.unit" placeholder="Unit (e.g. kg, liters, pkts)" required class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="text-[11px] text-purple-300/70 mb-1">Unit</label>
+            <input v-model="newInv.unit" placeholder="e.g. kg, liters, pkts" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
           </div>
 
+          <!-- Current Quantity -->
           <div class="flex flex-col">
-            <label class="text-xs text-gray-500 mb-1">Current Quantity</label>
-            <input v-model.number="newInv.quantity" type="number" min="0" required class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="text-[11px] text-purple-300/70 mb-1">Current Quantity</label>
+            <input v-model.number="newInv.quantity" type="number" min="0" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
           </div>
 
+          <!-- Min Threshold -->
           <div class="flex flex-col">
-            <label class="text-xs text-gray-500 mb-1">Min. Threshold</label>
-            <input v-model.number="newInv.minQuantity" type="number" min="0" required class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="text-[11px] text-purple-300/70 mb-1">Min. Threshold</label>
+            <input v-model.number="newInv.minQuantity" type="number" min="0" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
-          <button type="submit" class="col-span-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition" :disabled="saving">
+          <button type="submit" class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2.5 rounded-xl shadow-lg transition duration-200 mt-1" :disabled="saving">
             Save Item
           </button>
         </form>
@@ -110,56 +120,56 @@
 
       <!-- Stock List -->
       <div class="space-y-3">
-        <div v-for="item in filteredInventory" :key="item.id" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
+        <div v-for="item in filteredInventory" :key="item.id" class="bg-slate-900/80 p-4 rounded-2xl border border-purple-900/30 hover:border-purple-700/50 shadow-md transition duration-200 flex justify-between items-center">
           <div class="pr-2">
             <div class="flex items-center gap-2">
-              <h3 class="font-bold text-gray-900">{{ item.name }}</h3>
-              <span v-if="item.quantity === 0" class="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Out of Stock</span>
-              <span v-else-if="item.quantity <= item.minQuantity" class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Low Stock</span>
+              <h3 class="font-bold text-purple-100 text-sm">{{ item.name }}</h3>
+              <span v-if="item.quantity === 0" class="text-[10px] font-bold bg-red-950 text-red-300 border border-red-800/50 px-2 py-0.5 rounded-full">Out of Stock</span>
+              <span v-else-if="item.quantity <= item.minQuantity" class="text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800/50 px-2 py-0.5 rounded-full">Low Stock</span>
             </div>
-            <p class="text-xs text-gray-500 mt-0.5">
-              <span class="inline-block bg-gray-100 text-gray-700 font-medium px-2 py-0.5 rounded mr-1">{{ item.category || 'Others' }}</span> 
+            <p class="text-xs text-purple-300/60 mt-1 flex items-center gap-1.5">
+              <span class="inline-block bg-purple-950/70 text-purple-300 border border-purple-800/40 text-[10px] font-medium px-2 py-0.5 rounded-md">{{ item.category || 'Others' }}</span> 
               • Threshold: {{ item.minQuantity }} {{ item.unit }}
             </p>
           </div>
 
           <div class="flex items-center gap-3">
-            <div class="flex items-center bg-gray-100 rounded-lg p-1 border border-gray-200">
-              <button @click="updateQuantity(item, -1)" class="w-8 h-8 font-bold text-gray-700 bg-white rounded shadow-sm hover:bg-gray-50">-</button>
-              <span class="px-3 font-semibold text-sm min-w-[3rem] text-center">{{ item.quantity }} <span class="text-xs text-gray-500">{{ item.unit }}</span></span>
-              <button @click="updateQuantity(item, 1)" class="w-8 h-8 font-bold text-gray-700 bg-white rounded shadow-sm hover:bg-gray-50">+</button>
+            <div class="flex items-center bg-slate-950 rounded-xl p-1 border border-purple-900/50">
+              <button @click="updateQuantity(item, -1)" class="w-7 h-7 font-bold text-purple-200 bg-purple-900/40 rounded-lg shadow-sm hover:bg-purple-800/60 active:scale-95 transition">-</button>
+              <span class="px-3 font-semibold text-xs min-w-[3rem] text-center text-purple-100">{{ item.quantity }} <span class="text-[10px] text-purple-400/60">{{ item.unit }}</span></span>
+              <button @click="updateQuantity(item, 1)" class="w-7 h-7 font-bold text-purple-200 bg-purple-900/40 rounded-lg shadow-sm hover:bg-purple-800/60 active:scale-95 transition">+</button>
             </div>
-            <button @click="deleteInventoryItem(item.id)" class="text-gray-400 hover:text-red-600 text-lg px-1" title="Delete Item">&times;</button>
+            <button @click="deleteInventoryItem(item.id)" class="text-slate-600 hover:text-red-400 text-base px-1 transition" title="Delete Item">&times;</button>
           </div>
         </div>
-        <p v-if="filteredInventory.length === 0" class="text-center py-8 text-gray-400 text-sm">No items match your criteria.</p>
+        <p v-if="filteredInventory.length === 0" class="text-center py-8 text-purple-300/40 text-xs">No items match your criteria.</p>
       </div>
     </main>
 
     <!-- TAB 2: REMINDERS & DATES -->
     <main v-if="activeTab === 'reminders'">
       <div class="mb-4">
-        <button @click="showAddReminder = !showAddReminder" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded-lg transition">
+        <button @click="showAddReminder = !showAddReminder" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition">
           {{ showAddReminder ? 'Cancel' : '+ Add Important Date' }}
         </button>
       </div>
 
       <!-- Add New Reminder Form -->
-      <section v-if="showAddReminder" class="mb-6 p-4 bg-white border border-blue-200 rounded-xl shadow-sm">
-        <h3 class="text-sm font-bold text-gray-800 mb-3">Add Reminder / Date</h3>
-        <form @submit.prevent="addReminderItem" class="grid grid-cols-2 gap-3 text-sm">
-          <input v-model="newRem.title" placeholder="Title (e.g. Car Insurance)" required class="col-span-2 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-          <input v-model="newRem.category" placeholder="Category (e.g. Insurance, Birthdays)" required class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+      <section v-if="showAddReminder" class="mb-6 p-4 bg-slate-900 border border-purple-700/50 rounded-2xl shadow-xl shadow-purple-950/50">
+        <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider mb-3">Add Reminder / Date</h3>
+        <form @submit.prevent="addReminderItem" class="grid grid-cols-2 gap-3 text-xs">
+          <input v-model="newRem.title" placeholder="Title (e.g. Car Insurance)" required class="col-span-2 p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+          <input v-model="newRem.category" placeholder="Category (e.g. Insurance, Birthdays)" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           <div class="flex flex-col">
-            <label class="text-xs text-gray-500 mb-1">Target Date</label>
-            <input v-model="newRem.targetDate" type="date" required class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="text-[11px] text-purple-300/70 mb-1">Target Date</label>
+            <input v-model="newRem.targetDate" type="date" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
           <div class="flex flex-col col-span-2">
-            <label class="text-xs text-gray-500 mb-1">Notify Days Before</label>
-            <input v-model.number="newRem.notifyDaysBefore" type="number" min="1" required class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="text-[11px] text-purple-300/70 mb-1">Notify Days Before</label>
+            <input v-model.number="newRem.notifyDaysBefore" type="number" min="1" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
-          <input v-model="newRem.notes" placeholder="Notes (Optional policy numbers, details)" class="col-span-2 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-          <button type="submit" class="col-span-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition" :disabled="saving">
+          <input v-model="newRem.notes" placeholder="Notes (Optional details)" class="col-span-2 p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+          <button type="submit" class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2.5 rounded-xl shadow-lg transition duration-200 mt-1" :disabled="saving">
             Save Date
           </button>
         </form>
@@ -167,19 +177,19 @@
 
       <!-- Reminders List -->
       <div class="space-y-3">
-        <div v-for="rem in sortedReminders" :key="rem.id" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex justify-between items-start">
+        <div v-for="rem in sortedReminders" :key="rem.id" class="bg-slate-900/80 p-4 rounded-2xl border border-purple-900/30 hover:border-purple-700/50 shadow-md transition duration-200 flex justify-between items-start">
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="font-bold text-gray-900">{{ rem.title }}</h3>
-              <span v-if="getReminderStatus(rem) === 'EXPIRED'" class="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Due Today / Past Due</span>
-              <span v-else-if="getReminderStatus(rem) === 'DUE_SOON'" class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Due Soon</span>
+              <h3 class="font-bold text-purple-100 text-sm">{{ rem.title }}</h3>
+              <span v-if="getReminderStatus(rem) === 'EXPIRED'" class="text-[10px] font-bold bg-red-950 text-red-300 border border-red-800/50 px-2 py-0.5 rounded-full">Due Today / Past Due</span>
+              <span v-else-if="getReminderStatus(rem) === 'DUE_SOON'" class="text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800/50 px-2 py-0.5 rounded-full">Due Soon</span>
             </div>
-            <p class="text-xs text-gray-500 mt-0.5">{{ rem.category }} • Target Date: <span class="font-semibold text-gray-700">{{ rem.targetDate }}</span></p>
-            <p v-if="rem.notes" class="text-xs text-gray-600 mt-1 italic">{{ rem.notes }}</p>
+            <p class="text-xs text-purple-300/60 mt-1">{{ rem.category }} • Target Date: <span class="font-semibold text-purple-200">{{ rem.targetDate }}</span></p>
+            <p v-if="rem.notes" class="text-xs text-purple-300/80 mt-1 italic">{{ rem.notes }}</p>
           </div>
-          <button @click="deleteReminderItem(rem.id)" class="text-gray-400 hover:text-red-600 text-lg px-1" title="Delete Reminder">&times;</button>
+          <button @click="deleteReminderItem(rem.id)" class="text-slate-600 hover:text-red-400 text-base px-1 transition" title="Delete Reminder">&times;</button>
         </div>
-        <p v-if="data.reminders.length === 0" class="text-center py-8 text-gray-400 text-sm">No important dates added yet.</p>
+        <p v-if="data.reminders.length === 0" class="text-center py-8 text-purple-300/40 text-xs">No important dates added yet.</p>
       </div>
     </main>
 
@@ -309,11 +319,8 @@
         // COMPUTED PROPERTIES FOR FILTERING
         const filteredInventory = computed(() => {
           return data.value.inventory.filter(item => {
-            // Category condition
             const matchesCategory = selectedCategoryFilter.value === 'ALL' || item.category === selectedCategoryFilter.value;
-            // Low stock condition
             const matchesLowStock = !filterLowStock.value || (item.quantity <= item.minQuantity);
-            
             return matchesCategory && matchesLowStock;
           });
         });
