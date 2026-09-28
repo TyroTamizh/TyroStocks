@@ -1,7 +1,7 @@
 import { STOCK_CATEGORIES, DATE_CATEGORIES } from './config.js';
 import { fetchHouseholdData, saveHouseholdData } from './api.js';
 
-const { createApp, ref, computed, onMounted } = Vue;
+const { createApp, ref, computed, onMounted } = window.Vue;
 
 createApp({
   setup() {
@@ -11,7 +11,8 @@ createApp({
     const errorMessage = ref('');
     const lastSynced = ref('');
 
-    // Filters
+    // Filters & Search
+    const searchQuery = ref('');
     const filterLowStock = ref(false);
     const selectedCategoryFilter = ref('ALL');
     const selectedDateTypeFilter = ref('ALL');
@@ -144,9 +145,14 @@ createApp({
     // Computed Properties
     const filteredInventory = computed(() => {
       return data.value.inventory.filter(item => {
+        const query = searchQuery.value.trim().toLowerCase();
+        const matchesSearch = !query || 
+          item.name.toLowerCase().includes(query) || 
+          (item.category && item.category.toLowerCase().includes(query));
         const matchesCategory = selectedCategoryFilter.value === 'ALL' || item.category === selectedCategoryFilter.value;
         const matchesLowStock = !filterLowStock.value || (item.quantity <= item.minQuantity);
-        return matchesCategory && matchesLowStock;
+        
+        return matchesSearch && matchesCategory && matchesLowStock;
       });
     });
 
@@ -206,7 +212,7 @@ createApp({
     return {
       STOCK_CATEGORIES, DATE_CATEGORIES,
       activeTab, loading, saving, errorMessage, lastSynced,
-      filterLowStock, selectedCategoryFilter, selectedDateTypeFilter, selectedDateCategoryFilter,
+      searchQuery, filterLowStock, selectedCategoryFilter, selectedDateTypeFilter, selectedDateCategoryFilter,
       showAddInventory, showAddReminder, data, newInv, newRem,
       editingInv, editInvForm, startEditInv, cancelEditInv, saveEditInventory,
       editingRem, editRemForm, startEditRem, cancelEditRem, saveEditReminder,
