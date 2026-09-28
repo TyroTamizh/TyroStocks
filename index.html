@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,22 +11,28 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen">
 
   <div id="app" class="max-w-7xl mx-auto px-3 sm:px-4 pb-12">
-    
+
     <!-- FIXED TOP SECTION (Header, Tabs, Filters) -->
     <div class="sticky top-0 z-30 bg-slate-950/95 backdrop-blur-md pt-3 pb-3 mb-5 border-b border-purple-900/30">
-      
+
       <!-- Royal Header -->
-      <header class="flex items-center justify-between bg-slate-900/90 p-3 rounded-2xl border border-purple-800/40 shadow-lg shadow-purple-950/40 mb-3">
+      <header
+        class="flex items-center justify-between bg-slate-900/90 p-3 rounded-2xl border border-purple-800/40 shadow-lg shadow-purple-950/40 mb-3">
         <div class="flex items-center gap-2.5">
-          <h1 class="text-base sm:text-lg font-extrabold bg-gradient-to-r from-purple-400 via-purple-300 to-indigo-300 bg-clip-text text-transparent flex items-center gap-2">
+          <h1
+            class="text-base sm:text-lg font-extrabold bg-gradient-to-r from-purple-400 via-purple-300 to-indigo-300 bg-clip-text text-transparent flex items-center gap-2">
             👑 Household Hub
           </h1>
-          <span class="text-[10px] text-purple-300/60 hidden sm:inline" v-if="lastSynced">Synced: {{ lastSynced }}</span>
+          <span class="text-[10px] text-purple-300/60 hidden sm:inline" v-if="lastSynced">Synced: {{ lastSynced
+            }}</span>
         </div>
-        <button @click="fetchData" class="px-2.5 py-1 text-xs font-semibold text-purple-200 bg-purple-900/40 border border-purple-500/30 rounded-xl hover:bg-purple-800/50 hover:border-purple-400/50 transition duration-200" :disabled="loading">
+        <button @click="fetchData"
+          class="px-2.5 py-1 text-xs font-semibold text-purple-200 bg-purple-900/40 border border-purple-500/30 rounded-xl hover:bg-purple-800/50 hover:border-purple-400/50 transition duration-200"
+          :disabled="loading">
           <span v-if="loading" class="animate-pulse">Syncing...</span>
           <span v-else>🔄 Refresh</span>
         </button>
@@ -33,62 +40,72 @@
 
       <!-- Navigation Tabs -->
       <nav class="flex space-x-2 bg-slate-900/60 p-1 rounded-2xl border border-purple-900/30 mb-3">
-        <button 
-          @click="activeTab = 'inventory'" 
+        <button @click="activeTab = 'inventory'"
           :class="['flex-1 py-1.5 text-xs font-bold rounded-xl transition duration-200', activeTab === 'inventory' ? 'bg-gradient-to-r from-purple-700 to-indigo-700 text-white shadow-md shadow-purple-900/50' : 'text-purple-300/60 hover:text-purple-200 hover:bg-purple-950/30']">
           🛒 Stock Inventory ({{ data.inventory.length }})
         </button>
-        <button 
-          @click="activeTab = 'reminders'" 
+        <button @click="activeTab = 'reminders'"
           :class="['flex-1 py-1.5 text-xs font-bold rounded-xl transition duration-200', activeTab === 'reminders' ? 'bg-gradient-to-r from-purple-700 to-indigo-700 text-white shadow-md shadow-purple-900/50' : 'text-purple-300/60 hover:text-purple-200 hover:bg-purple-950/30']">
           📅 Renewals & Dates ({{ data.reminders.length }})
         </button>
       </nav>
 
       <!-- Filters & Actions Bar (Inventory) -->
-      <div v-if="activeTab === 'inventory'" class="flex flex-col md:flex-row gap-2 items-center justify-between bg-slate-900/80 p-2.5 rounded-2xl border border-purple-900/40 shadow-sm">
-        <button v-if="!showAddInventory && !editingInv" @click="showAddInventory = true" class="w-full md:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-1.5 px-3 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition whitespace-nowrap">
+      <div v-if="activeTab === 'inventory'"
+        class="flex flex-col md:flex-row gap-2 items-center justify-between bg-slate-900/80 p-2.5 rounded-2xl border border-purple-900/40 shadow-sm">
+        <button v-if="!showAddInventory && !editingInv" @click="showAddInventory = true"
+          class="w-full md:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-1.5 px-3 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition whitespace-nowrap">
           + Add Stock Item
         </button>
 
         <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full md:w-auto">
           <!-- Search Bar -->
           <div class="relative w-full sm:w-44">
-            <input v-model="searchQuery" type="text" placeholder="🔍 Search stock..." class="w-full pl-2.5 pr-6 py-1 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 placeholder-purple-400/50 focus:ring-2 focus:ring-purple-500 outline-none">
-            <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-2 top-1 text-xs text-purple-400/60 hover:text-purple-200">&times;</button>
+            <input v-model="searchQuery" type="text" placeholder="🔍 Search stock..."
+              class="w-full pl-2.5 pr-6 py-1 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 placeholder-purple-400/50 focus:ring-2 focus:ring-purple-500 outline-none">
+            <button v-if="searchQuery" @click="searchQuery = ''"
+              class="absolute right-2 top-1 text-xs text-purple-400/60 hover:text-purple-200">&times;</button>
           </div>
 
           <!-- Category Filter -->
-          <select v-model="selectedCategoryFilter" class="w-full sm:w-36 p-1 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+          <select v-model="selectedCategoryFilter"
+            class="w-full sm:w-36 p-1 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
             <option value="ALL">All Categories</option>
             <option v-for="cat in STOCK_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
           </select>
 
           <!-- Low Stock Toggle -->
-          <label class="inline-flex items-center cursor-pointer text-xs font-medium text-purple-200/80 whitespace-nowrap gap-2 bg-slate-950 px-2.5 py-1 rounded-xl border border-purple-900/50 w-full sm:w-auto justify-between sm:justify-start">
+          <label
+            class="inline-flex items-center cursor-pointer text-xs font-medium text-purple-200/80 whitespace-nowrap gap-2 bg-slate-950 px-2.5 py-1 rounded-xl border border-purple-900/50 w-full sm:w-auto justify-between sm:justify-start">
             <span>Low Stock</span>
             <input type="checkbox" v-model="filterLowStock" class="sr-only peer">
-            <div class="relative w-6 h-3.5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
+            <div
+              class="relative w-6 h-3.5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500">
+            </div>
           </label>
         </div>
       </div>
 
       <!-- Filters & Actions Bar (Reminders) -->
-      <div v-if="activeTab === 'reminders'" class="flex flex-col sm:flex-row gap-2 items-center justify-between bg-slate-900/80 p-2.5 rounded-2xl border border-purple-900/40 shadow-sm">
-        <button v-if="!showAddReminder && !editingRem" @click="showAddReminder = true" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-1.5 px-3 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition whitespace-nowrap">
+      <div v-if="activeTab === 'reminders'"
+        class="flex flex-col sm:flex-row gap-2 items-center justify-between bg-slate-900/80 p-2.5 rounded-2xl border border-purple-900/40 shadow-sm">
+        <button v-if="!showAddReminder && !editingRem" @click="showAddReminder = true"
+          class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-1.5 px-3 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition whitespace-nowrap">
           + Add Date / Reminder
         </button>
 
         <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
           <!-- Type Filter -->
-          <select v-model="selectedDateTypeFilter" class="w-full sm:w-36 p-1 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+          <select v-model="selectedDateTypeFilter"
+            class="w-full sm:w-36 p-1 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
             <option value="ALL">All Event Types</option>
             <option value="ANNUAL">🎂 Annual Events</option>
             <option value="FIXED">⏳ Reminders & Renewals</option>
           </select>
 
           <!-- Category Filter -->
-          <select v-model="selectedDateCategoryFilter" class="w-full sm:w-40 p-1 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+          <select v-model="selectedDateCategoryFilter"
+            class="w-full sm:w-40 p-1 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
             <option value="ALL">All Categories</option>
             <option v-for="cat in DATE_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
           </select>
@@ -98,93 +115,113 @@
     </div>
 
     <!-- Global Error Message -->
-    <div v-if="errorMessage" class="mb-4 p-2.5 bg-red-950/80 border border-red-700/50 text-red-200 text-xs rounded-xl flex justify-between items-center shadow-lg">
+    <div v-if="errorMessage"
+      class="mb-4 p-2.5 bg-red-950/80 border border-red-700/50 text-red-200 text-xs rounded-xl flex justify-between items-center shadow-lg">
       <span>{{ errorMessage }}</span>
       <button @click="errorMessage = ''" class="font-bold ml-2 text-red-400 hover:text-white">&times;</button>
     </div>
 
     <!-- TAB 1: INVENTORY MANAGER -->
     <main v-if="activeTab === 'inventory'">
-      
+
       <!-- Add New Stock Form -->
-      <section v-if="showAddInventory" class="mb-5 max-w-lg mx-auto p-3.5 bg-slate-900 border border-purple-700/50 rounded-2xl shadow-xl shadow-purple-950/50">
+      <section v-if="showAddInventory"
+        class="mb-5 max-w-lg mx-auto p-3.5 bg-slate-900 border border-purple-700/50 rounded-2xl shadow-xl shadow-purple-950/50">
         <div class="flex justify-between items-center mb-2.5">
           <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider">Add Stock Item</h3>
-          <button @click="showAddInventory = false" class="text-purple-300/60 hover:text-purple-100 text-sm font-bold transition px-1" title="Close">✕</button>
+          <button @click="showAddInventory = false"
+            class="text-purple-300/60 hover:text-purple-100 text-sm font-bold transition px-1" title="Close">✕</button>
         </div>
         <form @submit.prevent="addInventoryItem" class="grid grid-cols-2 gap-2.5 text-xs">
           <div class="col-span-2 flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Item Name</label>
-            <input v-model="newInv.name" placeholder="e.g. Sona Masoori Rice" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model="newInv.name" placeholder="e.g. Sona Masoori Rice" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Category</label>
-            <select v-model="newInv.category" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+            <select v-model="newInv.category" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
               <option v-for="cat in STOCK_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Unit</label>
-            <input v-model="newInv.unit" placeholder="e.g. kg, pkts" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model="newInv.unit" placeholder="e.g. kg, pkts" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Current Qty</label>
-            <input v-model.number="newInv.quantity" type="number" min="0" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model.number="newInv.quantity" type="number" step="0.01" min="0" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Min. Threshold</label>
-            <input v-model.number="newInv.minQuantity" type="number" min="0" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model.number="newInv.minQuantity" type="number" step="0.01" min="0" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
-          <button type="submit" class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2 rounded-xl shadow-lg transition duration-200 mt-1" :disabled="saving">
+          <button type="submit"
+            class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2 rounded-xl shadow-lg transition duration-200 mt-1"
+            :disabled="saving">
             Save Item
           </button>
         </form>
       </section>
 
       <!-- Edit Stock Form -->
-      <section v-if="editingInv" class="mb-5 max-w-lg mx-auto p-3.5 bg-slate-900 border border-indigo-500/60 rounded-2xl shadow-xl shadow-purple-950/60">
+      <section v-if="editingInv"
+        class="mb-5 max-w-lg mx-auto p-3.5 bg-slate-900 border border-indigo-500/60 rounded-2xl shadow-xl shadow-purple-950/60">
         <div class="flex justify-between items-center mb-2.5">
           <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">✏️ Edit Stock Item</h3>
-          <button @click="cancelEditInv" class="text-purple-300/60 hover:text-purple-100 text-sm font-bold transition px-1" title="Cancel">✕</button>
+          <button @click="cancelEditInv"
+            class="text-purple-300/60 hover:text-purple-100 text-sm font-bold transition px-1" title="Cancel">✕</button>
         </div>
         <form @submit.prevent="saveEditInventory" class="grid grid-cols-2 gap-2.5 text-xs">
           <div class="col-span-2 flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Item Name</label>
-            <input v-model="editInvForm.name" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model="editInvForm.name" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Category</label>
-            <select v-model="editInvForm.category" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+            <select v-model="editInvForm.category" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
               <option v-for="cat in STOCK_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Unit</label>
-            <input v-model="editInvForm.unit" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model="editInvForm.unit" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Current Qty</label>
-            <input v-model.number="editInvForm.quantity" type="number" min="0" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model.number="editInvForm.quantity" type="number" min="0" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Min. Threshold</label>
-            <input v-model.number="editInvForm.minQuantity" type="number" min="0" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model.number="editInvForm.minQuantity" type="number" min="0" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="col-span-2 flex gap-2 mt-1">
-            <button type="button" @click="cancelEditInv" class="flex-1 bg-slate-800 hover:bg-slate-700 text-purple-200 font-semibold py-1.5 rounded-xl transition">
+            <button type="button" @click="cancelEditInv"
+              class="flex-1 bg-slate-800 hover:bg-slate-700 text-purple-200 font-semibold py-1.5 rounded-xl transition">
               Cancel
             </button>
-            <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-1.5 rounded-xl shadow-lg transition duration-200" :disabled="saving">
+            <button type="submit"
+              class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-1.5 rounded-xl shadow-lg transition duration-200"
+              :disabled="saving">
               Update Item
             </button>
           </div>
@@ -193,67 +230,80 @@
 
       <!-- COMPACT SQUARE CARDS GRID (2 cols on mobile, up to 6 cols on wide desktop) -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-        <div 
-          v-for="item in filteredInventory" 
-          :key="item.id" 
-          class="aspect-square bg-slate-900/80 border border-purple-900/30 hover:border-purple-600/60 rounded-xl p-2.5 flex flex-col justify-between shadow-md relative group transition-all duration-200 overflow-hidden"
-        >
+        <div v-for="item in filteredInventory" :key="item.id"
+          class="aspect-square bg-slate-900/80 border border-purple-900/30 hover:border-purple-600/60 rounded-xl p-2.5 flex flex-col justify-between shadow-md relative group transition-all duration-200 overflow-hidden">
           <!-- Top Row: Category Badge & Actions -->
           <div class="flex items-center justify-between gap-1">
-            <span class="inline-block bg-purple-950/80 text-purple-300 border border-purple-800/40 text-[9px] font-semibold px-1.5 py-0.5 rounded-md truncate max-w-[65%]">
+            <span
+              class="inline-block bg-purple-950/80 text-purple-300 border border-purple-800/40 text-[9px] font-semibold px-1.5 py-0.5 rounded-md truncate max-w-[65%]">
               {{ item.category || 'Others' }}
             </span>
             <div class="flex items-center gap-0.5 bg-slate-950/60 p-0.5 rounded-md border border-purple-950/40">
-              <button @click="startEditInv(item)" class="text-purple-400 hover:text-purple-200 text-[10px] px-0.5" title="Edit">✏️</button>
-              <button @click="deleteInventoryItem(item.id)" class="text-slate-500 hover:text-red-400 text-xs px-0.5" title="Delete">&times;</button>
+              <button @click="startEditInv(item)" class="text-purple-400 hover:text-purple-200 text-[10px] px-0.5"
+                title="Edit">✏️</button>
+              <button @click="deleteInventoryItem(item.id)" class="text-slate-500 hover:text-red-400 text-xs px-0.5"
+                title="Delete">&times;</button>
             </div>
           </div>
 
-          <!-- Middle Content: Item Name & Low Stock Status -->
+          <!-- Middle Content -->
           <div class="flex flex-col items-center justify-center text-center px-0.5 my-auto">
             <h3 class="font-bold text-purple-100 text-xs leading-snug line-clamp-2">{{ item.name }}</h3>
-            
+
             <div class="mt-1">
-              <span v-if="item.quantity === 0" class="text-[8px] font-extrabold bg-red-950 text-red-300 border border-red-800/60 px-1.5 py-0.5 rounded-full">Out of Stock</span>
-              <span v-else-if="item.quantity <= item.minQuantity" class="text-[8px] font-extrabold bg-amber-950 text-amber-300 border border-amber-800/60 px-1.5 py-0.5 rounded-full">Low Stock</span>
-              <span v-else class="text-[8px] text-purple-300/50 font-medium">Min: {{ item.minQuantity }} {{ item.unit }}</span>
+              <span v-if="item.quantity === 0"
+                class="text-[8px] font-extrabold bg-red-950 text-red-300 border border-red-800/60 px-1.5 py-0.5 rounded-full">Out
+                of Stock</span>
+              <span v-else-if="item.quantity <= item.minQuantity"
+                class="text-[8px] font-extrabold bg-amber-950 text-amber-300 border border-amber-800/60 px-1.5 py-0.5 rounded-full">Low
+                Stock</span>
+              <span v-else class="text-[8px] text-purple-300/50 font-medium">Min: {{ formatQuantity(item.minQuantity) }}
+                {{ item.unit }}</span>
             </div>
           </div>
 
-          <!-- Bottom Row: Compact Quantity Stepper -->
+          <!-- Bottom Quantity Stepper (Increments by 0.5 or 1 based on preference) -->
           <div class="bg-slate-950/90 rounded-lg p-1 border border-purple-900/40 flex items-center justify-between">
-            <button @click="updateQuantity(item, -1)" class="w-6 h-6 font-bold text-xs text-purple-200 bg-purple-900/40 hover:bg-purple-800/60 rounded-md shadow-sm active:scale-95 transition">-</button>
+            <button @click="updateQuantity(item, -0.5)"
+              class="w-6 h-6 font-bold text-xs text-purple-200 bg-purple-900/40 hover:bg-purple-800/60 rounded-md shadow-sm active:scale-95 transition">-</button>
             <div class="flex flex-col items-center">
-              <span class="font-extrabold text-xs text-purple-100 leading-none">{{ item.quantity }}</span>
+              <span class="font-extrabold text-xs text-purple-100 leading-none">{{ formatQuantity(item.quantity)
+                }}</span>
               <span class="text-[8px] text-purple-400/60 font-medium leading-none mt-0.5">{{ item.unit }}</span>
             </div>
-            <button @click="updateQuantity(item, 1)" class="w-6 h-6 font-bold text-xs text-purple-200 bg-purple-900/40 hover:bg-purple-800/60 rounded-md shadow-sm active:scale-95 transition">+</button>
+            <button @click="updateQuantity(item, 0.5)"
+              class="w-6 h-6 font-bold text-xs text-purple-200 bg-purple-900/40 hover:bg-purple-800/60 rounded-md shadow-sm active:scale-95 transition">+</button>
           </div>
         </div>
       </div>
 
-      <p v-if="filteredInventory.length === 0" class="text-center py-10 text-purple-300/40 text-xs">No stock items match your criteria or search.</p>
+      <p v-if="filteredInventory.length === 0" class="text-center py-10 text-purple-300/40 text-xs">No stock items match
+        your criteria or search.</p>
     </main>
 
     <!-- TAB 2: RENEWALS & DATES -->
     <main v-if="activeTab === 'reminders'">
 
       <!-- Add New Reminder Form -->
-      <section v-if="showAddReminder" class="mb-5 max-w-lg mx-auto p-3.5 bg-slate-900 border border-purple-700/50 rounded-2xl shadow-xl shadow-purple-950/50">
+      <section v-if="showAddReminder"
+        class="mb-5 max-w-lg mx-auto p-3.5 bg-slate-900 border border-purple-700/50 rounded-2xl shadow-xl shadow-purple-950/50">
         <div class="flex justify-between items-center mb-2.5">
           <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider">Add Date / Reminder</h3>
-          <button @click="showAddReminder = false" class="text-purple-300/60 hover:text-purple-100 text-sm font-bold transition px-1" title="Close">✕</button>
+          <button @click="showAddReminder = false"
+            class="text-purple-300/60 hover:text-purple-100 text-sm font-bold transition px-1" title="Close">✕</button>
         </div>
-        
+
         <form @submit.prevent="addReminderItem" class="grid grid-cols-2 gap-2.5 text-xs">
           <div class="col-span-2 flex flex-col bg-slate-950 p-2 rounded-xl border border-purple-800/40">
             <label class="text-[10px] text-purple-300/80 font-semibold mb-1">Event Type</label>
             <div class="grid grid-cols-2 gap-2">
-              <label :class="['flex items-center justify-center p-1.5 rounded-lg cursor-pointer border transition text-xs font-semibold', newRem.type === 'ANNUAL' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
+              <label
+                :class="['flex items-center justify-center p-1.5 rounded-lg cursor-pointer border transition text-xs font-semibold', newRem.type === 'ANNUAL' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
                 <input type="radio" v-model="newRem.type" value="ANNUAL" class="sr-only">
                 🎂 Annual Event
               </label>
-              <label :class="['flex items-center justify-center p-1.5 rounded-lg cursor-pointer border transition text-xs font-semibold', newRem.type === 'FIXED' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
+              <label
+                :class="['flex items-center justify-center p-1.5 rounded-lg cursor-pointer border transition text-xs font-semibold', newRem.type === 'FIXED' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
                 <input type="radio" v-model="newRem.type" value="FIXED" class="sr-only">
                 ⏳ Reminder / Renewal
               </label>
@@ -262,53 +312,64 @@
 
           <div class="col-span-2 flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Title</label>
-            <input v-model="newRem.title" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model="newRem.title" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Category</label>
-            <select v-model="newRem.category" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+            <select v-model="newRem.category" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
               <option v-for="cat in DATE_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Target Date</label>
-            <input v-model="newRem.targetDate" type="date" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none w-full cursor-pointer">
+            <input v-model="newRem.targetDate" type="date" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none w-full cursor-pointer">
           </div>
 
           <div class="flex flex-col col-span-2">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Notify Days Before</label>
-            <input v-model.number="newRem.notifyDaysBefore" type="number" min="1" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model.number="newRem.notifyDaysBefore" type="number" min="1" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="col-span-2 flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Notes (Optional)</label>
-            <input v-model="newRem.notes" placeholder="Policy numbers, gift ideas, details..." class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model="newRem.notes" placeholder="Policy numbers, gift ideas, details..."
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
-          <button type="submit" class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2 rounded-xl shadow-lg transition duration-200 mt-1" :disabled="saving">
+          <button type="submit"
+            class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2 rounded-xl shadow-lg transition duration-200 mt-1"
+            :disabled="saving">
             Save Date
           </button>
         </form>
       </section>
 
       <!-- Edit Reminder Form -->
-      <section v-if="editingRem" class="mb-5 max-w-lg mx-auto p-3.5 bg-slate-900 border border-indigo-500/60 rounded-2xl shadow-xl shadow-purple-950/60">
+      <section v-if="editingRem"
+        class="mb-5 max-w-lg mx-auto p-3.5 bg-slate-900 border border-indigo-500/60 rounded-2xl shadow-xl shadow-purple-950/60">
         <div class="flex justify-between items-center mb-2.5">
           <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">✏️ Edit Date / Reminder</h3>
-          <button @click="cancelEditRem" class="text-purple-300/60 hover:text-purple-100 text-sm font-bold transition px-1" title="Cancel">✕</button>
+          <button @click="cancelEditRem"
+            class="text-purple-300/60 hover:text-purple-100 text-sm font-bold transition px-1" title="Cancel">✕</button>
         </div>
-        
+
         <form @submit.prevent="saveEditReminder" class="grid grid-cols-2 gap-2.5 text-xs">
           <div class="col-span-2 flex flex-col bg-slate-950 p-2 rounded-xl border border-purple-800/40">
             <label class="text-[10px] text-purple-300/80 font-semibold mb-1">Event Type</label>
             <div class="grid grid-cols-2 gap-2">
-              <label :class="['flex items-center justify-center p-1.5 rounded-lg cursor-pointer border transition text-xs font-semibold', editRemForm.type === 'ANNUAL' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
+              <label
+                :class="['flex items-center justify-center p-1.5 rounded-lg cursor-pointer border transition text-xs font-semibold', editRemForm.type === 'ANNUAL' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
                 <input type="radio" v-model="editRemForm.type" value="ANNUAL" class="sr-only">
                 🎂 Annual Event
               </label>
-              <label :class="['flex items-center justify-center p-1.5 rounded-lg cursor-pointer border transition text-xs font-semibold', editRemForm.type === 'FIXED' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
+              <label
+                :class="['flex items-center justify-center p-1.5 rounded-lg cursor-pointer border transition text-xs font-semibold', editRemForm.type === 'FIXED' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
                 <input type="radio" v-model="editRemForm.type" value="FIXED" class="sr-only">
                 ⏳ Reminder / Renewal
               </label>
@@ -317,36 +378,44 @@
 
           <div class="col-span-2 flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Title</label>
-            <input v-model="editRemForm.title" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model="editRemForm.title" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Category</label>
-            <select v-model="editRemForm.category" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+            <select v-model="editRemForm.category" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
               <option v-for="cat in DATE_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Target Date</label>
-            <input v-model="editRemForm.targetDate" type="date" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none w-full cursor-pointer">
+            <input v-model="editRemForm.targetDate" type="date" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none w-full cursor-pointer">
           </div>
 
           <div class="flex flex-col col-span-2">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Notify Days Before</label>
-            <input v-model.number="editRemForm.notifyDaysBefore" type="number" min="1" required class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model.number="editRemForm.notifyDaysBefore" type="number" min="1" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="col-span-2 flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Notes (Optional)</label>
-            <input v-model="editRemForm.notes" placeholder="Policy numbers, gift ideas, details..." class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <input v-model="editRemForm.notes" placeholder="Policy numbers, gift ideas, details..."
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="col-span-2 flex gap-2 mt-1">
-            <button type="button" @click="cancelEditRem" class="flex-1 bg-slate-800 hover:bg-slate-700 text-purple-200 font-semibold py-1.5 rounded-xl transition">
+            <button type="button" @click="cancelEditRem"
+              class="flex-1 bg-slate-800 hover:bg-slate-700 text-purple-200 font-semibold py-1.5 rounded-xl transition">
               Cancel
             </button>
-            <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-1.5 rounded-xl shadow-lg transition duration-200" :disabled="saving">
+            <button type="submit"
+              class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-1.5 rounded-xl shadow-lg transition duration-200"
+              :disabled="saving">
               Update Date
             </button>
           </div>
@@ -355,37 +424,40 @@
 
       <!-- COMPACT REMINDER CARDS GRID -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-        <div 
-          v-for="rem in sortedReminders" 
-          :key="rem.id" 
-          class="aspect-square bg-slate-900/80 border border-purple-900/30 hover:border-purple-600/60 rounded-xl p-2.5 flex flex-col justify-between shadow-md relative group transition-all duration-200 overflow-hidden"
-        >
+        <div v-for="rem in sortedReminders" :key="rem.id"
+          class="aspect-square bg-slate-900/80 border border-purple-900/30 hover:border-purple-600/60 rounded-xl p-2.5 flex flex-col justify-between shadow-md relative group transition-all duration-200 overflow-hidden">
           <!-- Top Row: Category & Action Buttons -->
           <div class="flex items-center justify-between gap-1">
-            <span class="inline-block bg-purple-950/80 text-purple-300 border border-purple-800/40 text-[9px] font-semibold px-1.5 py-0.5 rounded-md truncate max-w-[65%]">
+            <span
+              class="inline-block bg-purple-950/80 text-purple-300 border border-purple-800/40 text-[9px] font-semibold px-1.5 py-0.5 rounded-md truncate max-w-[65%]">
               {{ rem.category || 'Others' }}
             </span>
             <div class="flex items-center gap-0.5 bg-slate-950/60 p-0.5 rounded-md border border-purple-950/40">
-              <button @click="startEditRem(rem)" class="text-purple-400 hover:text-purple-200 text-[10px] px-0.5" title="Edit">✏️</button>
-              <button @click="deleteReminderItem(rem.id)" class="text-slate-500 hover:text-red-400 text-xs px-0.5" title="Delete">&times;</button>
+              <button @click="startEditRem(rem)" class="text-purple-400 hover:text-purple-200 text-[10px] px-0.5"
+                title="Edit">✏️</button>
+              <button @click="deleteReminderItem(rem.id)" class="text-slate-500 hover:text-red-400 text-xs px-0.5"
+                title="Delete">&times;</button>
             </div>
           </div>
 
           <!-- Middle Content: Title & Countdown -->
           <div class="flex flex-col items-center justify-center text-center px-0.5 my-auto">
             <h3 class="font-bold text-purple-100 text-xs leading-snug line-clamp-2">{{ rem.title }}</h3>
-            
+
             <p class="text-[10px] text-purple-300/80 font-semibold mt-0.5">{{ rem.displayCountdown }}</p>
 
             <!-- Status Badges -->
             <div class="mt-0.5">
-              <span v-if="rem.type === 'ANNUAL'" class="text-[8px] font-bold bg-purple-950 text-purple-300 border border-purple-700/50 px-1.5 py-0.5 rounded-full">
+              <span v-if="rem.type === 'ANNUAL'"
+                class="text-[8px] font-bold bg-purple-950 text-purple-300 border border-purple-700/50 px-1.5 py-0.5 rounded-full">
                 🎂 {{ rem.milestoneText }}
               </span>
-              <span v-else-if="rem.computedStatus === 'EXPIRED'" class="text-[8px] font-bold bg-red-950 text-red-300 border border-red-800/50 px-1.5 py-0.5 rounded-full">
+              <span v-else-if="rem.computedStatus === 'EXPIRED'"
+                class="text-[8px] font-bold bg-red-950 text-red-300 border border-red-800/50 px-1.5 py-0.5 rounded-full">
                 Past Due
               </span>
-              <span v-else-if="rem.computedStatus === 'DUE_SOON'" class="text-[8px] font-bold bg-amber-950 text-amber-300 border border-amber-800/50 px-1.5 py-0.5 rounded-full">
+              <span v-else-if="rem.computedStatus === 'DUE_SOON'"
+                class="text-[8px] font-bold bg-amber-950 text-amber-300 border border-amber-800/50 px-1.5 py-0.5 rounded-full">
                 Due Soon
               </span>
             </div>
@@ -400,11 +472,13 @@
         </div>
       </div>
 
-      <p v-if="sortedReminders.length === 0" class="text-center py-10 text-purple-300/40 text-xs">No important dates or reminders match your criteria.</p>
+      <p v-if="sortedReminders.length === 0" class="text-center py-10 text-purple-300/40 text-xs">No important dates or
+        reminders match your criteria.</p>
     </main>
 
   </div>
 
   <script type="module" src="js/app.js"></script>
 </body>
+
 </html>

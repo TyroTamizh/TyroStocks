@@ -30,6 +30,20 @@ createApp({
     const newInv = ref({ name: '', category: 'Others', quantity: 1, unit: 'pkts', minQuantity: 1 });
     const newRem = ref({ type: 'ANNUAL', title: '', category: 'Birthdays & Anniversaries', targetDate: '', notes: '', notifyDaysBefore: 7 });
 
+    // Format helper for display
+    const formatQuantity = (val) => {
+      const num = Number(val);
+      if (isNaN(num)) return '0';
+      
+      // If integer (e.g. 1, 5, 10), display without trailing zeros
+      if (Number.isInteger(num)) {
+        return num.toString();
+      }
+      
+      // If decimal (e.g. 1.5), format to 2 fixed decimal places (1.50)
+      return num.toFixed(2);
+    };
+
     // Fetch Data
     const fetchData = async () => {
       loading.value = true;
@@ -64,18 +78,19 @@ createApp({
 
     // Inventory Handlers
     const updateQuantity = (item, delta) => {
-      const updatedVal = item.quantity + delta;
-      if (updatedVal >= 0) {
-        item.quantity = updatedVal;
-        item.updatedAt = new Date().toISOString().split('T')[0];
-        saveData();
-      }
+      // Round float arithmetic to prevent 0.30000000000000004 issues
+      const updatedVal = Math.max(0, Math.round((Number(item.quantity) + delta) * 100) / 100);
+      item.quantity = updatedVal;
+      item.updatedAt = new Date().toISOString().split('T')[0];
+      saveData();
     };
 
     const addInventoryItem = () => {
       data.value.inventory.push({
         id: 'inv_' + Date.now(),
         ...newInv.value,
+        quantity: Math.round(Number(newInv.value.quantity) * 100) / 100,
+        minQuantity: Math.round(Number(newInv.value.minQuantity) * 100) / 100,
         updatedAt: new Date().toISOString().split('T')[0]
       });
       saveData();
@@ -96,6 +111,8 @@ createApp({
       if (idx !== -1) {
         data.value.inventory[idx] = {
           ...editInvForm.value,
+          quantity: Math.round(Number(editInvForm.value.quantity) * 100) / 100,
+          minQuantity: Math.round(Number(editInvForm.value.minQuantity) * 100) / 100,
           updatedAt: new Date().toISOString().split('T')[0]
         };
         saveData();
@@ -216,7 +233,7 @@ createApp({
       showAddInventory, showAddReminder, data, newInv, newRem,
       editingInv, editInvForm, startEditInv, cancelEditInv, saveEditInventory,
       editingRem, editRemForm, startEditRem, cancelEditRem, saveEditReminder,
-      fetchData, updateQuantity, addInventoryItem, deleteInventoryItem,
+      fetchData, updateQuantity, formatQuantity, addInventoryItem, deleteInventoryItem,
       addReminderItem, deleteReminderItem, filteredInventory, sortedReminders
     };
   }
