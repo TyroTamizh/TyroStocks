@@ -51,8 +51,8 @@
     <main v-if="activeTab === 'inventory'">
       <!-- Controls & Filters Bar -->
       <div class="flex flex-col gap-3 mb-4">
-        <button @click="showAddInventory = !showAddInventory" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition">
-          {{ showAddInventory ? 'Cancel' : '+ Add New Stock Item' }}
+        <button v-if="!showAddInventory" @click="showAddInventory = true" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition">
+          + Add New Stock Item
         </button>
 
         <!-- Filters Section -->
@@ -62,7 +62,7 @@
             <label class="text-xs font-semibold text-purple-200/80 whitespace-nowrap">Category:</label>
             <select v-model="selectedCategoryFilter" class="w-full p-2 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
               <option value="ALL">All Categories</option>
-              <option v-for="cat in CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
+              <option v-for="cat in STOCK_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
@@ -77,36 +77,33 @@
 
       <!-- Add New Stock Form -->
       <section v-if="showAddInventory" class="mb-6 p-4 bg-slate-900 border border-purple-700/50 rounded-2xl shadow-xl shadow-purple-950/50">
-        <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider mb-3">Add Stock Item</h3>
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider">Add Stock Item</h3>
+          <button @click="showAddInventory = false" class="text-purple-300/60 hover:text-purple-100 text-base font-bold transition px-1" title="Close">✕</button>
+        </div>
         <form @submit.prevent="addInventoryItem" class="grid grid-cols-2 gap-3 text-xs">
-          
-          <!-- Item Name -->
           <div class="col-span-2 flex flex-col">
             <label class="text-[11px] text-purple-300/70 mb-1">Item Name</label>
-            <input v-model="newInv.name" placeholder="e.g. Sona Masoori Rice" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
+            <input v-model="newInv.name" placeholder="e.g. Sona Masoori Rice" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
-          <!-- Category Dropdown -->
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[11px] text-purple-300/70 mb-1">Category</label>
-            <select v-model="newInv.category" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
-              <option v-for="cat in CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
+            <select v-model="newInv.category" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+              <option v-for="cat in STOCK_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
-          <!-- Unit -->
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[11px] text-purple-300/70 mb-1">Unit</label>
-            <input v-model="newInv.unit" placeholder="e.g. kg, liters, pkts" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
+            <input v-model="newInv.unit" placeholder="e.g. kg, liters, pkts" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
-          <!-- Current Quantity -->
           <div class="flex flex-col">
             <label class="text-[11px] text-purple-300/70 mb-1">Current Quantity</label>
-            <input v-model.number="newInv.quantity" type="number" min="0" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-400 outline-none">
+            <input v-model.number="newInv.quantity" type="number" min="0" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
-          <!-- Min Threshold -->
           <div class="flex flex-col">
             <label class="text-[11px] text-purple-300/70 mb-1">Min. Threshold</label>
             <input v-model.number="newInv.minQuantity" type="number" min="0" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
@@ -146,50 +143,137 @@
       </div>
     </main>
 
-    <!-- TAB 2: REMINDERS & DATES -->
+    <!-- TAB 2: RENEWALS & DATES -->
     <main v-if="activeTab === 'reminders'">
-      <div class="mb-4">
-        <button @click="showAddReminder = !showAddReminder" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition">
-          {{ showAddReminder ? 'Cancel' : '+ Add Important Date' }}
+      <!-- Controls & Filters Bar -->
+      <div class="flex flex-col gap-3 mb-4">
+        <button v-if="!showAddReminder" @click="showAddReminder = true" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-purple-950/50 border border-purple-400/20 transition">
+          + Add Important Date / Reminder
         </button>
+
+        <!-- Filters Section -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-900/80 p-3 rounded-2xl border border-purple-900/40 shadow-sm">
+          <!-- Date Type Filter -->
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-semibold text-purple-200/80 whitespace-nowrap">Type:</label>
+            <select v-model="selectedDateTypeFilter" class="w-full p-2 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+              <option value="ALL">All Types</option>
+              <option value="ANNUAL">🎂 Annual Events</option>
+              <option value="FIXED">⏳ Reminders & Renewals</option>
+            </select>
+          </div>
+
+          <!-- Date Category Filter -->
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-semibold text-purple-200/80 whitespace-nowrap">Category:</label>
+            <select v-model="selectedDateCategoryFilter" class="w-full p-2 text-xs border border-purple-800/50 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+              <option value="ALL">All Categories</option>
+              <option v-for="cat in DATE_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <!-- Add New Reminder Form -->
       <section v-if="showAddReminder" class="mb-6 p-4 bg-slate-900 border border-purple-700/50 rounded-2xl shadow-xl shadow-purple-950/50">
-        <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider mb-3">Add Reminder / Date</h3>
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider">Add Date / Reminder</h3>
+          <button @click="showAddReminder = false" class="text-purple-300/60 hover:text-purple-100 text-base font-bold transition px-1" title="Close">✕</button>
+        </div>
+        
         <form @submit.prevent="addReminderItem" class="grid grid-cols-2 gap-3 text-xs">
-          <input v-model="newRem.title" placeholder="Title (e.g. Car Insurance)" required class="col-span-2 p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
-          <input v-model="newRem.category" placeholder="Category (e.g. Insurance, Birthdays)" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
-          <div class="flex flex-col">
-            <label class="text-[11px] text-purple-300/70 mb-1">Target Date</label>
+          
+          <!-- Event Type Toggle -->
+          <div class="col-span-2 flex flex-col bg-slate-950 p-2.5 rounded-xl border border-purple-800/40">
+            <label class="text-[11px] text-purple-300/80 font-semibold mb-1.5">Event Type</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label :class="['flex items-center justify-center p-2 rounded-lg cursor-pointer border transition text-xs font-semibold', newRem.type === 'ANNUAL' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
+                <input type="radio" v-model="newRem.type" value="ANNUAL" class="sr-only">
+                🎂 Annual Event
+              </label>
+              <label :class="['flex items-center justify-center p-2 rounded-lg cursor-pointer border transition text-xs font-semibold', newRem.type === 'FIXED' ? 'bg-purple-900/60 border-purple-500 text-white' : 'border-slate-800 text-purple-300/60 hover:text-purple-200']">
+                <input type="radio" v-model="newRem.type" value="FIXED" class="sr-only">
+                ⏳ Reminder / Renewal
+              </label>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div class="col-span-2 flex flex-col">
+            <label class="text-[11px] text-purple-300/70 mb-1">Title</label>
+            <input v-model="newRem.title" :placeholder="newRem.type === 'ANNUAL' ? 'e.g. Wife\'s Birthday' : 'e.g. Health Insurance Renewal'" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+          </div>
+
+          <!-- Category Dropdown -->
+          <div class="flex flex-col col-span-2 sm:col-span-1">
+            <label class="text-[11px] text-purple-300/70 mb-1">Category</label>
+            <select v-model="newRem.category" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+              <option v-for="cat in DATE_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+          <!-- Date Selector -->
+          <div class="flex flex-col col-span-2 sm:col-span-1">
+            <label class="text-[11px] text-purple-300/70 mb-1">
+              {{ newRem.type === 'ANNUAL' ? 'Original Date / DOB (Required)' : 'Target Date (Required)' }}
+            </label>
             <input v-model="newRem.targetDate" type="date" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
+
+          <!-- Notify Days Before -->
           <div class="flex flex-col col-span-2">
             <label class="text-[11px] text-purple-300/70 mb-1">Notify Days Before</label>
             <input v-model.number="newRem.notifyDaysBefore" type="number" min="1" required class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
-          <input v-model="newRem.notes" placeholder="Notes (Optional details)" class="col-span-2 p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+
+          <!-- Notes -->
+          <div class="col-span-2 flex flex-col">
+            <label class="text-[11px] text-purple-300/70 mb-1">Notes (Optional)</label>
+            <input v-model="newRem.notes" placeholder="Policy numbers, gift ideas, details..." class="p-2 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+          </div>
+
           <button type="submit" class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2.5 rounded-xl shadow-lg transition duration-200 mt-1" :disabled="saving">
             Save Date
           </button>
         </form>
       </section>
 
-      <!-- Reminders List -->
+      <!-- Reminders & Dates List -->
       <div class="space-y-3">
         <div v-for="rem in sortedReminders" :key="rem.id" class="bg-slate-900/80 p-4 rounded-2xl border border-purple-900/30 hover:border-purple-700/50 shadow-md transition duration-200 flex justify-between items-start">
-          <div>
-            <div class="flex items-center gap-2">
+          <div class="pr-2">
+            <!-- Title & Status Badges -->
+            <div class="flex items-center gap-2 flex-wrap">
               <h3 class="font-bold text-purple-100 text-sm">{{ rem.title }}</h3>
-              <span v-if="getReminderStatus(rem) === 'EXPIRED'" class="text-[10px] font-bold bg-red-950 text-red-300 border border-red-800/50 px-2 py-0.5 rounded-full">Due Today / Past Due</span>
-              <span v-else-if="getReminderStatus(rem) === 'DUE_SOON'" class="text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800/50 px-2 py-0.5 rounded-full">Due Soon</span>
+              
+              <!-- Annual Badge -->
+              <span v-if="rem.type === 'ANNUAL'" class="text-[10px] font-bold bg-purple-950 text-purple-300 border border-purple-700/50 px-2 py-0.5 rounded-full">
+                🎂 {{ rem.milestoneText }}
+              </span>
+
+              <!-- Status Badges for Fixed Reminders -->
+              <span v-else-if="rem.computedStatus === 'EXPIRED'" class="text-[10px] font-bold bg-red-950 text-red-300 border border-red-800/50 px-2 py-0.5 rounded-full">
+                Past Due / Due Today
+              </span>
+              <span v-else-if="rem.computedStatus === 'DUE_SOON'" class="text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800/50 px-2 py-0.5 rounded-full">
+                Due Soon
+              </span>
             </div>
-            <p class="text-xs text-purple-300/60 mt-1">{{ rem.category }} • Target Date: <span class="font-semibold text-purple-200">{{ rem.targetDate }}</span></p>
-            <p v-if="rem.notes" class="text-xs text-purple-300/80 mt-1 italic">{{ rem.notes }}</p>
+
+            <!-- Details Line -->
+            <p class="text-xs text-purple-300/60 mt-1 flex items-center gap-1.5 flex-wrap">
+              <span class="inline-block bg-purple-950/70 text-purple-300 border border-purple-800/40 text-[10px] font-medium px-2 py-0.5 rounded-md">{{ rem.category || 'Others' }}</span>
+              • <span class="text-purple-200 font-medium">{{ rem.displayCountdown }}</span>
+              <span class="text-purple-300/40">({{ rem.type === 'ANNUAL' ? 'Next: ' + rem.nextTargetFormatted : 'Date: ' + rem.targetDate }})</span>
+            </p>
+
+            <p v-if="rem.notes" class="text-xs text-purple-300/80 mt-1.5 italic bg-slate-950/50 p-1.5 rounded-lg border border-purple-950/50">{{ rem.notes }}</p>
           </div>
+
           <button @click="deleteReminderItem(rem.id)" class="text-slate-600 hover:text-red-400 text-base px-1 transition" title="Delete Reminder">&times;</button>
         </div>
-        <p v-if="data.reminders.length === 0" class="text-center py-8 text-purple-300/40 text-xs">No important dates added yet.</p>
+
+        <p v-if="sortedReminders.length === 0" class="text-center py-8 text-purple-300/40 text-xs">No important dates or reminders match your criteria.</p>
       </div>
     </main>
 
@@ -201,11 +285,17 @@
     // CONFIGURATION: Replace with your actual Cloudflare Worker URL
     const API_URL = 'https://household-api.tamizh602.workers.dev/';
 
-    // PREDEFINED CATEGORIES
-    const CATEGORIES = [
+    // STOCK CATEGORIES
+    const STOCK_CATEGORIES = [
       'Grains', 'Flours', 'Powders', 'Spices', 'Dairy',
       'Toiletries', 'Groceries', 'Sweet & savory', 'Fruits and Veggies',
       'Religious Goods', 'Hardware and Gears', 'Electronics', 'Others'
+    ];
+
+    // DATE CATEGORIES
+    const DATE_CATEGORIES = [
+      'Birthdays & Anniversaries', 'Health & Medical', 'Insurance & Financial',
+      'Subscriptions & Bills', 'Vehicle & Maintenance', 'Documents & Legal', 'Others'
     ];
 
     createApp({
@@ -215,8 +305,12 @@
         const saving = ref(false);
         const errorMessage = ref('');
         const lastSynced = ref('');
+
+        // Filters
         const filterLowStock = ref(false);
         const selectedCategoryFilter = ref('ALL');
+        const selectedDateTypeFilter = ref('ALL');
+        const selectedDateCategoryFilter = ref('ALL');
 
         const showAddInventory = ref(false);
         const showAddReminder = ref(false);
@@ -227,9 +321,9 @@
         });
 
         const newInv = ref({ name: '', category: 'Others', quantity: 1, unit: 'pkts', minQuantity: 1 });
-        const newRem = ref({ title: '', category: '', targetDate: '', notes: '', notifyDaysBefore: 14 });
+        const newRem = ref({ type: 'ANNUAL', title: '', category: 'Birthdays & Anniversaries', targetDate: '', notes: '', notifyDaysBefore: 7 });
 
-        // FETCH DATA FROM CLOUDFLARE WORKER / KV
+        // FETCH DATA
         const fetchData = async () => {
           loading.value = true;
           errorMessage.value = '';
@@ -249,7 +343,7 @@
           }
         };
 
-        // SAVE DATA TO CLOUDFLARE WORKER / KV
+        // SAVE DATA
         const saveData = async () => {
           saving.value = true;
           errorMessage.value = '';
@@ -305,7 +399,7 @@
           };
           data.value.reminders.push(newReminder);
           saveData();
-          newRem.value = { title: '', category: '', targetDate: '', notes: '', notifyDaysBefore: 14 };
+          newRem.value = { type: 'ANNUAL', title: '', category: 'Birthdays & Anniversaries', targetDate: '', notes: '', notifyDaysBefore: 7 };
           showAddReminder.value = false;
         };
 
@@ -316,7 +410,7 @@
           }
         };
 
-        // COMPUTED PROPERTIES FOR FILTERING
+        // COMPUTED PROPERTIES FOR INVENTORY
         const filteredInventory = computed(() => {
           return data.value.inventory.filter(item => {
             const matchesCategory = selectedCategoryFilter.value === 'ALL' || item.category === selectedCategoryFilter.value;
@@ -325,33 +419,82 @@
           });
         });
 
+        // COMPUTED PROPERTIES & DATE CALCULATIONS FOR REMINDERS
         const sortedReminders = computed(() => {
-          return [...data.value.reminders].sort((a, b) => new Date(a.targetDate) - new Date(b.targetDate));
-        });
-
-        const getReminderStatus = (rem) => {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
-          const target = new Date(rem.targetDate);
-          
-          const diffTime = target - today;
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-          if (diffDays <= 0) return 'EXPIRED';
-          if (diffDays <= rem.notifyDaysBefore) return 'DUE_SOON';
-          return 'OK';
-        };
+          return data.value.reminders
+            .filter(rem => {
+              const remType = rem.type || 'FIXED';
+              const matchesType = selectedDateTypeFilter.value === 'ALL' || remType === selectedDateTypeFilter.value;
+              const matchesCategory = selectedDateCategoryFilter.value === 'ALL' || rem.category === selectedDateCategoryFilter.value;
+              return matchesType && matchesCategory;
+            })
+            .map(rem => {
+              const itemType = rem.type || 'FIXED';
+              const origDate = new Date(rem.targetDate);
+              
+              let nextTarget = new Date(rem.targetDate);
+              let milestoneText = '';
+              let diffDays = 0;
+              let computedStatus = 'OK';
+
+              if (itemType === 'ANNUAL') {
+                // Calculate next occurrence for Annual Events
+                const currentYear = today.getFullYear();
+                nextTarget = new Date(currentYear, origDate.getMonth(), origDate.getDate());
+                
+                if (nextTarget < today) {
+                  nextTarget.setFullYear(currentYear + 1);
+                }
+
+                // Milestone Calculation (e.g., Turning 24 / 5th Anniversary)
+                const milestoneNum = nextTarget.getFullYear() - origDate.getFullYear();
+                milestoneText = `Turning ${milestoneNum}`;
+
+                const diffTime = nextTarget - today;
+                diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              } else {
+                // Standard Fixed Reminder Calculation
+                const diffTime = origDate - today;
+                diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays <= 0) computedStatus = 'EXPIRED';
+                else if (diffDays <= rem.notifyDaysBefore) computedStatus = 'DUE_SOON';
+              }
+
+              // Display text formatting
+              let displayCountdown = '';
+              if (diffDays === 0) displayCountdown = 'Due Today 🎉';
+              else if (diffDays < 0) displayCountdown = `Past due by ${Math.abs(diffDays)} day(s)`;
+              else displayCountdown = `In ${diffDays} day(s)`;
+
+              return {
+                ...rem,
+                type: itemType,
+                nextTarget,
+                nextTargetFormatted: nextTarget.toISOString().split('T')[0],
+                diffDays,
+                milestoneText,
+                computedStatus,
+                displayCountdown
+              };
+            })
+            .sort((a, b) => a.diffDays - b.diffDays);
+        });
 
         onMounted(() => {
           fetchData();
         });
 
         return {
-          CATEGORIES,
-          activeTab, loading, saving, errorMessage, lastSynced, filterLowStock, selectedCategoryFilter,
+          STOCK_CATEGORIES, DATE_CATEGORIES,
+          activeTab, loading, saving, errorMessage, lastSynced,
+          filterLowStock, selectedCategoryFilter, selectedDateTypeFilter, selectedDateCategoryFilter,
           showAddInventory, showAddReminder, data, newInv, newRem,
           fetchData, updateQuantity, addInventoryItem, deleteInventoryItem,
-          addReminderItem, deleteReminderItem, filteredInventory, sortedReminders, getReminderStatus
+          addReminderItem, deleteReminderItem, filteredInventory, sortedReminders
         };
       }
     }).mount('#app');
