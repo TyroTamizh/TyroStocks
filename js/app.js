@@ -1,4 +1,4 @@
-import { STOCK_CATEGORIES, DATE_CATEGORIES } from './config.js';
+import { STOCK_CATEGORIES, STOCK_UNITS, DATE_CATEGORIES } from './config.js';
 import { fetchHouseholdData, saveHouseholdData } from './api.js';
 
 const { createApp, ref, computed, onMounted } = window.Vue;
@@ -14,6 +14,7 @@ createApp({
     // Filters & Search
     const searchQuery = ref('');
     const filterLowStock = ref(false);
+    const filterAtLimit = ref(false);
     const selectedCategoryFilter = ref('ALL');
     const selectedDateTypeFilter = ref('ALL');
     const selectedDateCategoryFilter = ref('ALL');
@@ -21,6 +22,7 @@ createApp({
     // Visibility & Edit States
     const showAddInventory = ref(false);
     const showAddReminder = ref(false);
+    
     const editingInv = ref(null);
     const editInvForm = ref({ id: '', name: '', category: '', unit: '', quantity: 0, minQuantity: 0 });
     const editingRem = ref(null);
@@ -167,9 +169,14 @@ createApp({
           item.name.toLowerCase().includes(query) || 
           (item.category && item.category.toLowerCase().includes(query));
         const matchesCategory = selectedCategoryFilter.value === 'ALL' || item.category === selectedCategoryFilter.value;
-        const matchesLowStock = !filterLowStock.value || (item.quantity <= item.minQuantity);
         
-        return matchesSearch && matchesCategory && matchesLowStock;
+        const isLowStock = item.quantity > 0 && item.quantity < item.minQuantity;
+        const isAtLimit = item.quantity > 0 && item.quantity === item.minQuantity;
+
+        if (filterLowStock.value && !isLowStock) return false;
+        if (filterAtLimit.value && !isAtLimit) return false;
+        
+        return matchesSearch && matchesCategory;
       });
     });
 
@@ -227,9 +234,9 @@ createApp({
     onMounted(fetchData);
 
     return {
-      STOCK_CATEGORIES, DATE_CATEGORIES,
+      STOCK_CATEGORIES, STOCK_UNITS, DATE_CATEGORIES,
       activeTab, loading, saving, errorMessage, lastSynced,
-      searchQuery, filterLowStock, selectedCategoryFilter, selectedDateTypeFilter, selectedDateCategoryFilter,
+      searchQuery, filterLowStock, filterAtLimit, selectedCategoryFilter, selectedDateTypeFilter, selectedDateCategoryFilter,
       showAddInventory, showAddReminder, data, newInv, newRem,
       editingInv, editInvForm, startEditInv, cancelEditInv, saveEditInventory,
       editingRem, editRemForm, startEditRem, cancelEditRem, saveEditReminder,

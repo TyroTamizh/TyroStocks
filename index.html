@@ -83,6 +83,16 @@
               class="relative w-6 h-3.5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500">
             </div>
           </label>
+
+          <!-- At Limit Toggle -->
+          <label
+            class="inline-flex items-center cursor-pointer text-xs font-medium text-purple-200/80 whitespace-nowrap gap-2 bg-slate-950 px-2.5 py-1 rounded-xl border border-purple-900/50 w-full sm:w-auto justify-between sm:justify-start">
+            <span>At Limit</span>
+            <input type="checkbox" v-model="filterAtLimit" class="sr-only peer">
+            <div
+              class="relative w-6 h-3.5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-500">
+            </div>
+          </label>
         </div>
       </div>
 
@@ -149,8 +159,10 @@
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Unit</label>
-            <input v-model="newInv.unit" placeholder="e.g. kg, pkts" required
-              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <select v-model="newInv.unit" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+              <option v-for="unit in STOCK_UNITS" :key="unit" :value="unit">{{ unit }}</option>
+            </select>
           </div>
 
           <div class="flex flex-col">
@@ -198,19 +210,21 @@
 
           <div class="flex flex-col col-span-2 sm:col-span-1">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Unit</label>
-            <input v-model="editInvForm.unit" required
-              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
+            <select v-model="editInvForm.unit" required
+              class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-purple-100 focus:ring-2 focus:ring-purple-500 outline-none">
+              <option v-for="unit in STOCK_UNITS" :key="unit" :value="unit">{{ unit }}</option>
+            </select>
           </div>
 
           <div class="flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Current Qty</label>
-            <input v-model.number="editInvForm.quantity" type="number" min="0" required
+            <input v-model.number="editInvForm.quantity" type="number" step="0.01" min="0" required
               class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
           <div class="flex flex-col">
             <label class="text-[10px] text-purple-300/70 mb-0.5">Min. Threshold</label>
-            <input v-model.number="editInvForm.minQuantity" type="number" min="0" required
+            <input v-model.number="editInvForm.minQuantity" type="number" step="0.01" min="0" required
               class="p-1.5 border border-purple-800/60 rounded-xl bg-slate-950 text-white focus:ring-2 focus:ring-purple-500 outline-none">
           </div>
 
@@ -228,7 +242,7 @@
         </form>
       </section>
 
-      <!-- COMPACT SQUARE CARDS GRID (2 cols on mobile, up to 6 cols on wide desktop) -->
+      <!-- COMPACT SQUARE CARDS GRID -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         <div v-for="item in filteredInventory" :key="item.id"
           class="aspect-square bg-slate-900/80 border border-purple-900/30 hover:border-purple-600/60 rounded-xl p-2.5 flex flex-col justify-between shadow-md relative group transition-all duration-200 overflow-hidden">
@@ -254,7 +268,10 @@
               <span v-if="item.quantity === 0"
                 class="text-[8px] font-extrabold bg-red-950 text-red-300 border border-red-800/60 px-1.5 py-0.5 rounded-full">Out
                 of Stock</span>
-              <span v-else-if="item.quantity <= item.minQuantity"
+              <span v-else-if="item.quantity === item.minQuantity"
+                class="text-[8px] font-extrabold bg-blue-950 text-blue-300 border border-blue-800/60 px-1.5 py-0.5 rounded-full">At
+                Limit</span>
+              <span v-else-if="item.quantity < item.minQuantity"
                 class="text-[8px] font-extrabold bg-amber-950 text-amber-300 border border-amber-800/60 px-1.5 py-0.5 rounded-full">Low
                 Stock</span>
               <span v-else class="text-[8px] text-purple-300/50 font-medium">Min: {{ formatQuantity(item.minQuantity) }}
@@ -262,16 +279,16 @@
             </div>
           </div>
 
-          <!-- Bottom Quantity Stepper (Increments by 0.5 or 1 based on preference) -->
+          <!-- Bottom Quantity Stepper -->
           <div class="bg-slate-950/90 rounded-lg p-1 border border-purple-900/40 flex items-center justify-between">
-            <button @click="updateQuantity(item, -0.5)"
+            <button @click="updateQuantity(item, -0.25)"
               class="w-6 h-6 font-bold text-xs text-purple-200 bg-purple-900/40 hover:bg-purple-800/60 rounded-md shadow-sm active:scale-95 transition">-</button>
             <div class="flex flex-col items-center">
               <span class="font-extrabold text-xs text-purple-100 leading-none">{{ formatQuantity(item.quantity)
                 }}</span>
               <span class="text-[8px] text-purple-400/60 font-medium leading-none mt-0.5">{{ item.unit }}</span>
             </div>
-            <button @click="updateQuantity(item, 0.5)"
+            <button @click="updateQuantity(item, 0.25)"
               class="w-6 h-6 font-bold text-xs text-purple-200 bg-purple-900/40 hover:bg-purple-800/60 rounded-md shadow-sm active:scale-95 transition">+</button>
           </div>
         </div>
